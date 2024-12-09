@@ -7,7 +7,7 @@ export const Head = () => {
   return (
     <NextHead>
       <title>{siteConfig.name}</title>
-      <meta key="title" content={siteConfig.name} property="og:title" />
+      <meta key="Media Downloader" content={siteConfig.name} property="og:title" />
       <meta content={siteConfig.description} property="og:description" />
       <meta content={siteConfig.description} name="description" />
       <meta

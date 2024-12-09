@@ -1,15 +1,23 @@
 import React, { useState } from "react";
-import { Link } from "@nextui-org/link";
 import { button as buttonStyles } from "@nextui-org/theme";
 import DefaultLayout from "@/layouts/default";
-import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
 import { Button } from "@nextui-org/button";
 
 export default function IndexPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>(""); // State untuk input
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // State untuk error
 
   const handleDownload = (): void => {
+    // Validasi input kosong
+    if (!inputValue.trim()) {
+      setErrorMessage("Link tidak boleh kosong!");
+      return;
+    }
+
+    // Reset error message jika input valid
+    setErrorMessage(null);
     setIsLoading(true);
 
     // Simulasi proses download
@@ -33,88 +41,31 @@ export default function IndexPage() {
           </div>
         </div>
 
-        {/* Documentation Link */}
-        {/* <div className="flex gap-3">
-          <Link
-            isExternal
-            className={buttonStyles({
-              color: "primary",
-              radius: "full",
-              variant: "shadow",
-            })}
-            href={siteConfig.links.docs}
-          >
-            Documentation
-          </Link>
-        </div> */}
-
         {/* Input and Download Button */}
         <div className="mt-8 flex flex-col items-center gap-3">
           <input
             type="text"
-            placeholder="input your link ..."
-            className="input-field border rounded-md p-2 w-80"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)} // Update state input
+            placeholder="Input your link ..."
+            className="input-field border rounded-md border-purple-500 p-2 w-80"
           />
+          {/* Tampilkan error message jika ada */}
+          {errorMessage && (
+            <span className="text-red-500 text-sm">{errorMessage}</span>
+          )}
           <Button
             onClick={handleDownload}
-            disabled={isLoading}
+            isLoading={isLoading}
+            disabled={isLoading} // Disable button saat loading
             className="w-32"
             color="primary"
             radius="sm"
           >
-            {isLoading ? (
-              <span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="spinner"
-                  style={{
-                    width: "20px",
-                    height: "20px",
-                    marginRight: "5px",
-                    animation: "spin 1s linear infinite",
-                  }}
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    strokeWidth="4"
-                    stroke="currentColor"
-                    fill="transparent"
-                  />
-                </svg>
-                Loading...
-              </span>
-            ) : (
-              "Download"
-            )}
+            {isLoading ? "Loading..." : "Download"}
           </Button>
         </div>
       </section>
-
-      {/* Inline CSS */}
-      <style jsx>{`
-        .input-field {
-          outline: none;
-          border: 1px solid #ddd;
-        }
-
-        .spinner {
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </DefaultLayout>
   );
 }
