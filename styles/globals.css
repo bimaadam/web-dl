@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.swiper-slide img,
+.swiper-slide video {
+  width: 100%;
+  height: auto; /* Biarkan tinggi otomatis mengikuti lebar */
+  max-height: 300px; /* Batas tinggi maksimum */
+  object-fit: cover;
+  border-radius: 8px;
+}
+

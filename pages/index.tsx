@@ -3,14 +3,19 @@ import { button as buttonStyles } from "@nextui-org/theme";
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
 import { Button } from "@nextui-org/button";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
 
 export default function IndexPage() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState<string>(""); // State untuk input
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // State untuk error
-  const [downloadData, setDownloadData] = useState<any>(null); // State untuk hasil API
+  const [isLoading, setIsLoading] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [downloadData, setDownloadData] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(null);
 
-  const handleDownload = async (): Promise<void> => {
+  const handleDownload = async () => {
     if (!inputValue.trim()) {
       setErrorMessage("Link tidak boleh kosong!");
       return;
@@ -20,31 +25,59 @@ export default function IndexPage() {
     setIsLoading(true);
   
     try {
-  // Panggil API proxy
-  const response = await fetch(`/api/proxy?url=${encodeURIComponent(inputValue)}`);
-  if (!response.ok) {
-    throw new Error("Gagal mengambil data dari server");
-  }
-
-  const result = await response.json();
-  setDownloadData(result.data); // Simpan data hasil API
-} catch (error) {
-  if (error instanceof Error) {
-    setErrorMessage(error.message);
-  } else {
-    setErrorMessage("Terjadi kesalahan");
-  }
-} finally {
-  setIsLoading(false);
-  };
-}
-
+      const response = await fetch(`/api/proxy?url=${encodeURIComponent(inputValue)}`);
+      if (!response.ok) {
+        throw new Error("Gagal mengambil data dari server");
+      }
   
+      const result = await response.json();
+      console.log(result); // Debugging hasil dari API
+  
+      const mediaData = [];
+      if (result.data.url && Array.isArray(result.data.url)) {
+        result.data.url.forEach((url) => mediaData.push({ type: "image", url }));
+      }
+      if (result.data.hd_url && Array.isArray(result.data.hd_url)) {
+        result.data.hd_url.forEach((url) => mediaData.push({ type: "video", url }));
+      }
+      if (result.data.thumbnail) {
+        mediaData.push({ type: "image", url: result.data.thumbnail });
+      }
+  
+      console.log(mediaData); // Debugging data media yang diproses
+  
+      if (mediaData.length === 0) {
+        throw new Error("Media tidak ditemukan.");
+      }
+  
+      setDownloadData({
+        author: result.data.author || "Tidak diketahui",
+        caption: result.data.caption || "Tidak tersedia",
+        media: mediaData,
+      });
+    } catch (error) {
+      setErrorMessage(error.message || "Terjadi kesalahan saat mengambil media.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  
+
+
+  const openPreview = (media) => {
+    setSelectedMedia(media);
+    setShowPreview(true);
+  };
+
+  const closePreview = () => {
+    setShowPreview(false);
+    setSelectedMedia(null);
+  };
 
   return (
     <DefaultLayout>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-        {/* Header Section */}
         <div className="inline-block max-w-xl text-center">
           <span className={title()}>Social&nbsp;</span>
           <span className={title({ color: "violet" })}>Media&nbsp;</span>
@@ -55,24 +88,20 @@ export default function IndexPage() {
           </div>
         </div>
 
-        {/* Input and Download Button */}
         <div className="mt-8 flex flex-col items-center gap-3">
           <input
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)} // Update state input
+            onChange={(e) => setInputValue(e.target.value)}
             placeholder="Input your link ..."
             className="input-field border rounded-md border-purple-500 p-2 w-80"
           />
-          {/* Tampilkan error message jika ada */}
-          {errorMessage && (
-            <span className="text-red-500 text-sm">{errorMessage}</span>
-          )}
+          {errorMessage && <span className="text-red-500 text-sm">{errorMessage}</span>}
           <Button
             onClick={handleDownload}
             isLoading={isLoading}
-            disabled={isLoading} // Disable button saat loading
-            className="w-32"
+            disabled={isLoading}
+            className="w-32 transition-transform transform hover:scale-105 active:scale-95"
             color="primary"
             radius="sm"
           >
@@ -80,45 +109,92 @@ export default function IndexPage() {
           </Button>
         </div>
 
-        {/* Result Section */}
         {downloadData && (
-  <div className="mt-6 text-center">
-    <p>Author: {downloadData.author}</p>
-    <p>Caption: {downloadData.caption}</p>
-    
-    {/* Preview Video */}
-    {downloadData.video_url && (
-      <video
-        src={downloadData.video_url} // URL video dari API
-        controls
-        className="mt-4 w-80 border rounded-md shadow-md"
-      >
-        Browser kamu tidak mendukung video preview.
-      </video>
-    )}
+          <div className="mt-6 text-center">
+            {/* <p>Author: {downloadData.author}</p> */}
+            <p>Caption: {downloadData.caption}</p>
 
-    {/* Link Download Video */}
-    <a
-      href={downloadData.video_url} // Link ke video
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-500 underline mt-4 block"
-    >
-      Download Video
-    </a>
-    
-    {/* Link Download Audio */}
-    <a
-      href={downloadData.audio_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-500 underline mt-2 block"
-    >
-      Download Audio
-    </a>
+            {downloadData.media && downloadData.media.length > 0 ? (
+              <Swiper
+              spaceBetween={10}
+              slidesPerView={1}
+              navigation
+              className="mt-4 w-80 border rounded-md shadow-md"
+            >
+              {downloadData.media.map((media, index) => (
+                <SwiperSlide key={index}>
+                  {media.type === "image" ? (
+                    <img
+                      src={media.url}
+                      alt={`Media ${index + 1}`}
+                      className="w-full h-auto cursor-pointer rounded-md"
+                      onClick={() => openPreview(media)}
+                      crossOrigin="anonymous"
+                    />
+                  ) : (
+                    <video
+                      src={media.url}
+                      controls
+                      autoPlay={false}
+                      className="w-full h-auto rounded-md"
+                      crossOrigin="anonymous"
+                      preload="metadata"
+                    >
+                      Maaf, video tidak bisa diputar.
+                    </video>
+                  )}
+                  <a
+                    href={media.url}
+                    download={`media-${index + 1}`}
+                    className="block mt-2 text-center text-blue-500 hover:text-blue-600 transition"
+                  >
+                    Download Media
+                  </a>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            
+            
+            ) : (
+              <p className="text-gray-500">Tidak ada media yang dapat ditampilkan.</p>
+            )}
+
+{showPreview && selectedMedia && (
+  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
+    <div className="bg-white p-4 rounded-md shadow-md w-11/12 md:w-2/3 transform scale-90 transition-transform duration-300 ease-in-out">
+      <button
+        onClick={closePreview}
+        className="text-red-500 text-lg absolute top-4 right-4 hover:text-red-700 transition-colors"
+      >
+        &times;
+      </button>
+      {selectedMedia.type === "image" ? (
+        <img
+          src={selectedMedia.url}
+          alt="Preview"
+          className="w-full h-auto rounded-md"
+        />
+      ) : (
+        <video
+          src={selectedMedia.url}
+          controls
+          className="w-full h-auto rounded-md"
+        >
+          Browser kamu tidak mendukung video preview.
+        </video>
+      )}
+      <a
+        href={selectedMedia.url}
+        download
+        className="block mt-4 text-center bg-blue-500 hover:bg-blue-600 transition-colors text-white py-2 px-4 rounded-md"
+      >
+        Download Media
+      </a>
+    </div>
   </div>
 )}
-
+          </div>
+        )}
       </section>
     </DefaultLayout>
   );
