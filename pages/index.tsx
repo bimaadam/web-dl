@@ -9,7 +9,7 @@ import "swiper/css/navigation";
 export default function IndexPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [downloadData, setDownloadData] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
