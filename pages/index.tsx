@@ -39,33 +39,37 @@ export default function IndexPage() {
       if (!response.ok) {
         throw new Error("Gagal mengambil data dari server");
       }
-
+    
       const result = await response.json();
       const mediaData: Media[] = [];
-
+    
       if (result.data.url && Array.isArray(result.data.url)) {
         result.data.url.forEach((url: string) =>
           mediaData.push({ type: "image", url })
         );
       }
-
+    
       if (result.data.hd_url && Array.isArray(result.data.hd_url)) {
         result.data.hd_url.forEach((url: string) =>
           mediaData.push({ type: "video", url })
         );
       }
-
+    
       if (mediaData.length === 0) {
         throw new Error("Media tidak ditemukan.");
       }
-
+    
       setDownloadData({
         author: result.data.author || "Tidak diketahui",
         caption: result.data.caption || "Tidak tersedia",
         media: mediaData,
       });
     } catch (error) {
-      setErrorMessage(error.message || "Terjadi kesalahan saat mengambil media.");
+      if (error instanceof Error) {
+        setErrorMessage(error.message || "Terjadi kesalahan saat mengambil media.");
+      } else {
+        setErrorMessage("Terjadi kesalahan saat mengambil media.");
+      }
     } finally {
       setIsLoading(false);
     }
