@@ -8,24 +8,33 @@ export default function IndexPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>(""); // State untuk input
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // State untuk error
+  const [downloadData, setDownloadData] = useState<any>(null); // State untuk hasil API
 
-  const handleDownload = (): void => {
-    // Validasi input kosong
+  const handleDownload = async (): Promise<void> => {
     if (!inputValue.trim()) {
       setErrorMessage("Link tidak boleh kosong!");
       return;
     }
-
-    // Reset error message jika input valid
+  
     setErrorMessage(null);
     setIsLoading(true);
-
-    // Simulasi proses download
-    setTimeout(() => {
+  
+    try {
+      // Panggil API proxy
+      const response = await fetch(`/api/proxy?url=${encodeURIComponent(inputValue)}`);
+      if (!response.ok) {
+        throw new Error("Gagal mengambil data dari server");
+      }
+  
+      const result = await response.json();
+      setDownloadData(result.data); // Simpan data hasil API
+    } catch (error) {
+      setErrorMessage(error.message || "Terjadi kesalahan");
+    } finally {
       setIsLoading(false);
-      alert("Download selesai!");
-    }, 3000); // Simulasi 3 detik
+    }
   };
+  
 
   return (
     <DefaultLayout>
@@ -65,6 +74,46 @@ export default function IndexPage() {
             {isLoading ? "Loading..." : "Download"}
           </Button>
         </div>
+
+        {/* Result Section */}
+        {downloadData && (
+  <div className="mt-6 text-center">
+    <p>Author: {downloadData.author}</p>
+    <p>Caption: {downloadData.caption}</p>
+    
+    {/* Preview Video */}
+    {downloadData.video_url && (
+      <video
+        src={downloadData.video_url} // URL video dari API
+        controls
+        className="mt-4 w-80 border rounded-md shadow-md"
+      >
+        Browser kamu tidak mendukung video preview.
+      </video>
+    )}
+
+    {/* Link Download Video */}
+    <a
+      href={downloadData.video_url} // Link ke video
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-500 underline mt-4 block"
+    >
+      Download Video
+    </a>
+    
+    {/* Link Download Audio */}
+    <a
+      href={downloadData.audio_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-500 underline mt-2 block"
+    >
+      Download Audio
+    </a>
+  </div>
+)}
+
       </section>
     </DefaultLayout>
   );
