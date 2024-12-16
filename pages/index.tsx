@@ -101,6 +101,7 @@ if (result.data.hd_url && Array.isArray(result.data.hd_url)) {
 
         {downloadData && (
           <div className="mt-6 text-center">
+            <p>Author: {downloadData.author}</p>
             <p>Caption: {downloadData.caption}</p>
 
             {downloadData.media && downloadData.media.length > 0 ? (
