@@ -6,11 +6,25 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 
+interface Media {
+  type: "image" | "video";
+  url: string;
+}
+
+interface DownloadData {
+  author: string;
+  caption: string;
+  media: Media[];
+}
+
+
+
+
 export default function IndexPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [downloadData, setDownloadData] = useState(null);
+  const [downloadData, setDownloadData] = useState<DownloadData | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
 
