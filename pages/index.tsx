@@ -20,20 +20,25 @@ export default function IndexPage() {
     setIsLoading(true);
   
     try {
-      // Panggil API proxy
-      const response = await fetch(`/api/proxy?url=${encodeURIComponent(inputValue)}`);
-      if (!response.ok) {
-        throw new Error("Gagal mengambil data dari server");
-      }
-  
-      const result = await response.json();
-      setDownloadData(result.data); // Simpan data hasil API
-    } catch (error) {
-      setErrorMessage(error.message || "Terjadi kesalahan");
-    } finally {
-      setIsLoading(false);
-    }
+  // Panggil API proxy
+  const response = await fetch(`/api/proxy?url=${encodeURIComponent(inputValue)}`);
+  if (!response.ok) {
+    throw new Error("Gagal mengambil data dari server");
+  }
+
+  const result = await response.json();
+  setDownloadData(result.data); // Simpan data hasil API
+} catch (error) {
+  if (error instanceof Error) {
+    setErrorMessage(error.message);
+  } else {
+    setErrorMessage("Terjadi kesalahan");
+  }
+} finally {
+  setIsLoading(false);
   };
+}
+
   
 
   return (
