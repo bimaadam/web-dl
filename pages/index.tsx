@@ -148,40 +148,42 @@ export default function IndexPage() {
               <p className="text-gray-500">Tidak ada media yang dapat ditampilkan.</p>
             )}
 
-            {showPreview && selectedMedia && (
-              <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-                <div className="bg-white p-4 rounded-md shadow-md w-11/12 md:w-2/3 transform scale-90 transition-transform duration-300 ease-in-out">
-                  <button
-                    onClick={closePreview}
-                    className="text-red-500 text-lg absolute top-4 right-4 hover:text-red-700 transition-colors"
-                  >
-                    &times;
-                  </button>
-                  {selectedMedia.type === "image" ? (
-                    <img
-                      src={selectedMedia.url}
-                      alt="Preview"
-                      className="w-full h-auto rounded-md"
-                    />
-                  ) : (
-                    <video
-                      src={selectedMedia.url}
-                      controls
-                      className="w-full h-auto rounded-md"
-                    >
-                      Browser kamu tidak mendukung video preview.
-                    </video>
-                  )}
-                  <a
-                    href={selectedMedia.url}
-                    download
-                    className="block mt-4 text-center bg-blue-500 hover:bg-blue-600 transition-colors text-white py-2 px-4 rounded-md"
-                  >
-                    Download Media
-                  </a>
-                </div>
-              </div>
-            )}
+{showPreview && selectedMedia && (
+  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
+    <div className="bg-white p-4 rounded-md shadow-md w-11/12 md:w-2/3 transform scale-90 transition-transform duration-300 ease-in-out">
+      <button
+        onClick={closePreview}
+        className="text-red-500 text-lg absolute top-4 right-4 hover:text-red-700 transition-colors"
+        aria-label="Close preview"
+      >
+        &times;
+      </button>
+      {selectedMedia.type === "image" ? (
+        <img
+          src={selectedMedia.url}
+          alt="Preview"
+          className="w-full h-auto rounded-md"
+        />
+      ) : (
+        <video
+          src={selectedMedia.url}
+          controls
+          className="w-full h-auto rounded-md"
+        >
+          Browser kamu tidak mendukung video preview.
+        </video>
+      )}
+      <a
+        href={selectedMedia.url}
+        download
+        className="block mt-4 text-center bg-blue-500 hover:bg-blue-600 transition-colors text-white py-2 px-4 rounded-md"
+      >
+        Download Media
+      </a>
+    </div>
+  </div>
+)}
+
           </div>
         )}
       </section>
