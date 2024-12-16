@@ -139,7 +139,7 @@ export default function IndexPage() {
                       download={`media-${index + 1}`}
                       className="block mt-2 text-center text-blue-500 hover:text-blue-600 transition"
                     >
-                      Download Media
+                      Preview Media
                     </a>
                   </SwiperSlide>
                 ))}
