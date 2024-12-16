@@ -30,16 +30,14 @@ export default function IndexPage() {
       }
   
       const result = await response.json();
-      const mediaData = [];
-      if (result.data.url && Array.isArray(result.data.url)) {
-        result.data.url.forEach((url) => mediaData.push({ type: "image", url }));
-      }
-      if (result.data.hd_url && Array.isArray(result.data.hd_url)) {
-        result.data.hd_url.forEach((url) => mediaData.push({ type: "video", url }));
-      }
-      if (result.data.thumbnail) {
-        mediaData.push({ type: "image", url: result.data.thumbnail });
-      }
+      const mediaData: { type: string, url: string }[] = [];
+if (result.data.url && Array.isArray(result.data.url)) {
+  result.data.url.forEach((url: string) => mediaData.push({ type: "image", url }));
+}
+if (result.data.hd_url && Array.isArray(result.data.hd_url)) {
+  result.data.hd_url.forEach((url: string) => mediaData.push({ type: "video", url }));
+}
+
   
       if (mediaData.length === 0) {
         throw new Error("Media tidak ditemukan.");
