@@ -44,7 +44,7 @@ if (result.data.hd_url && Array.isArray(result.data.hd_url)) {
       }
   
       setDownloadData({
-        author: result.data.author || "Tidak diketahui",
+        // author: result.data.author || "Tidak diketahui",
         caption: result.data.caption || "Tidak tersedia",
         media: mediaData,
       });
