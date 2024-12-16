@@ -45,12 +45,19 @@ export default function IndexPage() {
   
       const result = await response.json();
       const mediaData: { type: string, url: string }[] = [];
-if (result.data.url && Array.isArray(result.data.url)) {
-  result.data.url.forEach((url: string) => mediaData.push({ type: "image", url }));
-}
-if (result.data.hd_url && Array.isArray(result.data.hd_url)) {
-  result.data.hd_url.forEach((url: string) => mediaData.push({ type: "video", url }));
-}
+      if (result.data.url && Array.isArray(result.data.url)) {
+        result.data.url.forEach((url: string) =>
+          mediaData.push({ type: "image", url } as const)
+        );
+      }
+      
+      if (result.data.hd_url && Array.isArray(result.data.hd_url)) {
+        result.data.hd_url.forEach((url: string) =>
+          mediaData.push({ type: "video", url } as const)
+        );
+      }
+      
+      
 
   
       if (mediaData.length === 0) {
