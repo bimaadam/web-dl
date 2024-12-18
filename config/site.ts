@@ -61,9 +61,9 @@ export const siteConfig = {
   ],
   links: {
     github: "https://github.com/bimaadam",
-    twitter: "https://twitter.com/getnextui",
-    docs: "https://nextui.org",
+    twitter: "",
+    docs: "",
     discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "",
+    sponsor: "https://saweria.co/bimrin",
   },
 };
